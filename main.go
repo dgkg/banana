@@ -34,25 +34,62 @@ func init() {
 }
 
 func initApp() {
-	fmt.Println("init")
+	// fmt.Println("init")
 }
 
 func main() {
 
-	wg := &sync.WaitGroup{}
-	emailNum := 10000
-	wg.Add(emailNum)
-	for i := 0; i < emailNum; i++ {
-		go SendEmail(wg)
-	}
-	wg.Wait()
+	// wg := &sync.WaitGroup{}
+	// emailNum := 10000
+	// wg.Add(emailNum)
+	// for i := 0; i < emailNum; i++ {
+	// 	go SendEmail(wg)
+	// }
+	// wg.Wait()
 
-	u := model.CreateUserWithPtr("toto")
-	fmt.Printf("%T - %v", u, u)
-	u.Name = "titi"
-	fmt.Printf("%T - %v", u, u)
+	u := model.CreateUserWithPtr("Doe")
+	fmt.Printf("type: %T - value: %#v - pointer: %p\n\n", u, u, u)
+	u2 := model.CreateUserByValue("Bob")
+	fmt.Printf("type: %T - value: %#v - pointer: %p\n\n", u2, u2, u2)
 	// ReadFile()
 	// execCode()
+
+	// for i := 0; i < 100; i++ {
+	// 	var j uint8
+	// 	fmt.Printf("%p\n", &j)
+	// }
+
+	tblMatrix := [3][3][3]int{
+		{{1, 2, 3},
+			{4, 5, 6},
+			{7, 8, 9}},
+		{{10, 11, 12},
+			{13, 14, 15},
+			{16, 17, 18}},
+		{{10, 11, 12},
+			{13, 14, 15},
+			{16, 17, 18}},
+	}
+
+	fmt.Println(tblMatrix)
+
+	tblA := []int{1, 2, 3, 4, 5}
+	fmt.Println(tblA)
+	// tblB := make([]int, len(tblA))
+	// copy(tblB, tblA)
+	var tblB []int
+	var tblC []int
+	tblB = append(tblB, tblA...)
+	tblC = append(tblC, tblA[:]...)
+
+	fmt.Printf("%p - %v - %v - %v\n", &tblA, tblA, len(tblA), cap(tblA))
+	fmt.Printf("%p - %v - %v - %v\n", &tblB, tblB, len(tblB), cap(tblB))
+	fmt.Printf("%p - %v - %v - %v\n", &tblC, tblC, len(tblC), cap(tblC))
+
+	tblA[0] = 10
+	fmt.Printf("%p - %v - %v - %v\n", &tblA, tblA, len(tblA), cap(tblA))
+	fmt.Printf("%p - %v - %v - %v\n", &tblB, tblB, len(tblB), cap(tblB))
+	fmt.Printf("%p - %v - %v - %v\n", &tblC, tblC, len(tblC), cap(tblC))
 }
 
 func execCode() error {
