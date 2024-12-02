@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
+	"github.com/dgkg/banana/model"
 	ser "github.com/dgkg/banana/services"
 )
 
@@ -36,7 +38,20 @@ func initApp() {
 }
 
 func main() {
-	ReadFile()
+
+	wg := &sync.WaitGroup{}
+	emailNum := 10000
+	wg.Add(emailNum)
+	for i := 0; i < emailNum; i++ {
+		go SendEmail(wg)
+	}
+	wg.Wait()
+
+	u := model.CreateUserWithPtr("toto")
+	fmt.Printf("%T - %v", u, u)
+	u.Name = "titi"
+	fmt.Printf("%T - %v", u, u)
+	// ReadFile()
 	// execCode()
 }
 
@@ -108,8 +123,16 @@ func fibo() func() int {
 	}
 }
 
+func SendEmail(wg *sync.WaitGroup) error {
+	time.Sleep(5 * time.Second)
+	fmt.Println("Email sent")
+	wg.Done()
+	return nil
+}
+
 func ReadFile() error {
 	defer fmt.Println("defer")
+	// data, err := ioutil.ReadFile("toto.json")
 	data, err := os.ReadFile("toto.json")
 	if err != nil {
 		return err
