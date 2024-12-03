@@ -62,3 +62,9 @@ func TestCloneSlice2(t *testing.T) {
 		t.Error("Expected", tbl, "got", res)
 	}
 }
+
+func TestAppendCapacity(t *testing.T) {
+	for i := 0; i < 5000; i++ {
+		AppendCapacity(i)
+	}
+}

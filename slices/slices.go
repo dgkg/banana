@@ -1,5 +1,7 @@
 package slices
 
+import "fmt"
+
 func CopiedSlice(s []int) []int {
 	copied := make([]int, len(s))
 	copy(copied, s)
@@ -31,4 +33,11 @@ func CloneSlice(s []int) []int {
 func CloneSlice2(s []int) []int {
 	cloned := s[:]
 	return cloned
+}
+
+var tblACapacity = []int{}
+
+func AppendCapacity(i int) {
+	tblACapacity = append(tblACapacity, i)
+	fmt.Println("Capacity:", cap(tblACapacity))
 }
