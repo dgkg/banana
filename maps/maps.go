@@ -18,7 +18,7 @@ package maps
 // 	delete(m, key)
 // }
 
-type MyMap map[string]interface{}
+type MyMap map[string]string
 
 // func New
 func New() MyMap {
@@ -26,12 +26,12 @@ func New() MyMap {
 }
 
 // func Add
-func (m MyMap) Add(key string, value interface{}) {
+func (m MyMap) Add(key string, value string) {
 	m[key] = value
 }
 
 // func Get
-func (m MyMap) Get(key string) interface{} {
+func (m MyMap) Get(key string) string {
 	return m[key]
 }
 
