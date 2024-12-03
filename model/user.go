@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/wearemojo/mojo-public-go/lib/ksuid"
 )
@@ -34,4 +35,18 @@ func CreateUserByValue(name string) User {
 		ID:   sk.String(),
 		Name: name,
 	}
+}
+
+func GenerateUsers(n int) map[string]User {
+	users := make(map[string]User)
+	for i := 0; i < n; i++ {
+		ctx := context.Background()
+		sk := ksuid.Generate(ctx, "user")
+		u := User{
+			ID:   sk.String(),
+			Name: "User-" + fmt.Sprintf("%v", i),
+		}
+		users[sk.String()] = u
+	}
+	return users
 }

@@ -39,6 +39,9 @@ func initApp() {
 
 func main() {
 
+	users := model.GenerateUsers(1000)
+	fmt.Println(users)
+
 	// wg := &sync.WaitGroup{}
 	// emailNum := 10000
 	// wg.Add(emailNum)
@@ -47,10 +50,10 @@ func main() {
 	// }
 	// wg.Wait()
 
-	u := model.CreateUserWithPtr("Doe")
-	fmt.Printf("type: %T - value: %#v - pointer: %p\n\n", u, u, u)
-	u2 := model.CreateUserByValue("Bob")
-	fmt.Printf("type: %T - value: %#v - pointer: %p\n\n", u2, u2, u2)
+	// u := model.CreateUserWithPtr("Doe")
+	// fmt.Printf("type: %T - value: %#v - pointer: %p\n\n", u, u, u)
+	// u2 := model.CreateUserByValue("Bob")
+	// fmt.Printf("type: %T - value: %#v - pointer: %p\n\n", u2, u2, &u2)
 	// ReadFile()
 	// execCode()
 
