@@ -112,7 +112,8 @@ func (h *Handler) UpdateUser(ctx *gin.Context) {
 	uuidParam := ctx.Param("uuid")
 	_, err := uuid.Parse(uuidParam)
 	if err != nil {
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		// ctx.AbortWithStatus(http.StatusBadRequest)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 	var payload model.UserUpdatePayload

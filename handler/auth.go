@@ -22,9 +22,9 @@ func BasicAuth(ctx *gin.Context) {
 func (h *Handler) newJWTToken(uuidUser, sign string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"uuid_user": uuidUser,
-		"issuer":    "banana",
+		"iss":       "banana",
 		"iat":       time.Now().Unix(),
-		"exp":       time.Now().Add(time.Minute * 30).Unix(),
+		"exp":       time.Now().Add(time.Second * 20).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
@@ -33,18 +33,17 @@ func (h *Handler) newJWTToken(uuidUser, sign string) (string, error) {
 
 func VerifyJWTToken(sign string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		start := time.Now()
+		// get the token from the header
 		jwtValue := ctx.GetHeader("Authorization")
-		if jwtValue == "" {
+		if jwtValue == "" || len(jwtValue) < 7 || jwtValue[:7] != "Bearer " {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		if len(jwtValue) < 7 || jwtValue[:7] != "Bearer " {
-			ctx.AbortWithStatus(http.StatusUnauthorized)
-			return
-		}
-		//
-		tokenString := jwtValue[7:]
+		// extract the token
+		tokenString := jwtValue[7:] // strings.ReplaceAll(jwtValue, "Bearer ", "")
 		log.Println("tokenString:", tokenString)
+		// parse the token
 		checkJWT := &parseMethod{secret: sign}
 		token, err := jwt.Parse(tokenString, checkJWT.parser)
 		if err != nil {
@@ -56,6 +55,13 @@ func VerifyJWTToken(sign string) gin.HandlerFunc {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			fmt.Println("token is valid", claims["iat"], claims["exp"], claims["uuid_user"])
 			ctx.Next()
+			elapsed := time.Since(start)
+			log.Printf("took %s", elapsed)
+			if elapsed < 1*time.Second {
+				time.Sleep(1*time.Second - elapsed)
+			}
+			fmt.Println("token is valid")
+
 		} else {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
@@ -69,8 +75,10 @@ type parseMethod struct {
 
 func (p *parseMethod) parser(token *jwt.Token) (interface{}, error) {
 	// Don't forget to validate the alg is what you expect:
-	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+	_, ok := token.Method.(*jwt.SigningMethodHMAC)
+	if !ok {
 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 	}
+
 	return []byte(p.secret), nil
 }
