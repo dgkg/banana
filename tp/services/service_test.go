@@ -6,7 +6,7 @@ import (
 	// contribs
 
 	// local
-	"github.com/dgkg/banana/services"
+	"banana/tp/services"
 )
 
 func TestAdd(t *testing.T) {
