@@ -15,8 +15,10 @@ func NewHandler(db *db.DB) *Handler {
 }
 
 func (h *Handler) InitRoutes(r *gin.Engine) {
+	authWithJWT := VerifyJWTToken("secret")
+
 	r.POST("/register", BasicAuth, h.Register)
 	r.POST("/login", h.Login)
-	r.GET("/users/:uuid", h.GetUserByID)
-	r.GET("/users", h.SearchUser)
+	r.GET("/users/:uuid", authWithJWT, h.GetUserByID)
+	r.GET("/users", authWithJWT, h.SearchUser)
 }

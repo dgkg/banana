@@ -31,8 +31,14 @@ func (h *Handler) Login(ctx *gin.Context) {
 		respError(ctx, "user", err)
 		return
 	}
+	// create a jwt token
+	jwtValue, err := h.newJWTToken(u.UUID, "secret")
+	if err != nil {
+		respError(ctx, "user", err)
+		return
+	}
 	// user is authorized
-	ctx.JSON(200, gin.H{"ok": true, "jwt": "jwt value coucou"})
+	ctx.JSON(200, gin.H{"ok": true, "jwt": jwtValue})
 }
 
 func (h *Handler) Register(ctx *gin.Context) {
