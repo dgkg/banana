@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/gin-gonic/gin"
 
 	"banana/db"
@@ -8,11 +11,22 @@ import (
 )
 
 func main() {
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "prod"
+	}
+	log.Println("ENV:", env)
 	// init db and elements of my app
-	myDb := db.NewDB()
+	var myDb db.DB
+	if env == "local" {
+		myDb = db.NewMoke()
+	} else if env == "prod" {
+		myDb = db.NewSQLite("banana.db")
+	}
 	if myDb == nil {
 		panic("error creating db")
 	}
+
 	// create handler
 	myHandler := handler.NewHandler(myDb)
 	// init routes

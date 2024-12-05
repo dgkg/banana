@@ -2,6 +2,11 @@ package db
 
 import "fmt"
 
+var (
+	ErrUserAllreadExists = NewErroNotAuthorized("user", "email allready exists")
+	ErrUserNotFound      = NewErroNotFound("user", "not found")
+)
+
 type ErrorDB struct {
 	Err        error
 	Entity     string

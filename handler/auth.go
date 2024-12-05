@@ -24,7 +24,7 @@ func (h *Handler) newJWTToken(uuidUser, sign string) (string, error) {
 		"uuid_user": uuidUser,
 		"iss":       "banana",
 		"iat":       time.Now().Unix(),
-		"exp":       time.Now().Add(time.Second * 20).Unix(),
+		"exp":       time.Now().Add(time.Minute * 20).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
@@ -42,7 +42,6 @@ func VerifyJWTToken(sign string) gin.HandlerFunc {
 		}
 		// extract the token
 		tokenString := jwtValue[7:] // strings.ReplaceAll(jwtValue, "Bearer ", "")
-		log.Println("tokenString:", tokenString)
 		// parse the token
 		checkJWT := &parseMethod{secret: sign}
 		token, err := jwt.Parse(tokenString, checkJWT.parser)
@@ -58,10 +57,10 @@ func VerifyJWTToken(sign string) gin.HandlerFunc {
 			elapsed := time.Since(start)
 			log.Printf("took %s", elapsed)
 			if elapsed < 1*time.Second {
+				fmt.Println("sleeping")
 				time.Sleep(1*time.Second - elapsed)
 			}
-			fmt.Println("token is valid")
-
+			fmt.Println("responding")
 		} else {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return

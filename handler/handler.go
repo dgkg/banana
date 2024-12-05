@@ -7,10 +7,10 @@ import (
 )
 
 type Handler struct {
-	db *db.DB
+	db db.DB
 }
 
-func NewHandler(db *db.DB) *Handler {
+func NewHandler(db db.DB) *Handler {
 	return &Handler{db: db}
 }
 
