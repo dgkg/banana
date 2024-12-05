@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 
 	"banana/db"
@@ -10,17 +8,16 @@ import (
 )
 
 func main() {
+	// init db and elements of my app
 	myDb := db.NewDB()
+	if myDb == nil {
+		panic("error creating db")
+	}
+	// create handler
 	myHandler := handler.NewHandler(myDb)
-
+	// init routes
 	r := gin.Default()
-	r.POST("/register", myHandler.Register)
-	r.POST("/login", HandlerTest, myHandler.Login)
-	r.GET("/users/:uuid", myHandler.GetUserByID)
-	r.GET("/users", myHandler.SearchUser)
-	r.Run(":8000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-}
-
-func HandlerTest(ctx *gin.Context) {
-	log.Println("test")
+	myHandler.InitRoutes(r)
+	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(":8000")
 }
