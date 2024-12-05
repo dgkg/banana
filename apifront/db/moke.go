@@ -3,7 +3,7 @@ package db
 import (
 	"github.com/agnivade/levenshtein"
 
-	"banana/model"
+	"banana/apifront/model"
 )
 
 var _ DB = &Moke{}

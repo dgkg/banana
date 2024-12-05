@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"banana/db"
-	"banana/handler"
+	"banana/apifront/db"
+	"banana/apifront/handler"
 )
 
 func main() {

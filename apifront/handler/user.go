@@ -1,13 +1,14 @@
 package handler
 
 import (
-	"banana/model"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
+
+	"banana/apifront/model"
 )
 
 func (h *Handler) Login(ctx *gin.Context) {

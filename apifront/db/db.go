@@ -1,6 +1,6 @@
 package db
 
-import "banana/model"
+import "banana/apifront/model"
 
 type DB interface {
 	SetUser(u *model.User) error

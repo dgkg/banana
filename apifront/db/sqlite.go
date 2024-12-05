@@ -1,10 +1,10 @@
 package db
 
 import (
-	"banana/model"
-
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
+
+	"banana/apifront/model"
 )
 
 var _ DB = &SQLite{}

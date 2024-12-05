@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 
-	"banana/db"
+	"banana/apifront/db"
 )
 
 type Handler struct {
