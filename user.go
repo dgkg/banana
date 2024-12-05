@@ -36,11 +36,11 @@ func (p *Password) UnmarshalJSON(b []byte) error {
 }
 
 func (p Password) String() string {
-	return "SSSSS"
+	return "****"
 }
 
 func (p Password) MarshalJSON() ([]byte, error) {
-	var s string = "JJJJJJ"
+	var s string = "****"
 	return json.Marshal(s)
 }
 

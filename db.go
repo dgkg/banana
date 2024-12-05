@@ -1,6 +1,10 @@
 package main
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/agnivade/levenshtein"
+)
 
 var db DB
 
@@ -49,4 +53,29 @@ func (db *DB) GetUserByEmail(email string) (*User, error) {
 		}
 	}
 	return nil, ErrUserNotFound
+}
+
+func (db *DB) GetUserByName(name string) ([]User, error) {
+	var res []User
+	for _, u := range db.Users {
+		distance := levenshtein.ComputeDistance(u.FirstName+" "+u.LastName, name)
+		if distance > 3 {
+			res = append(res, u)
+		}
+	}
+	if len(res) > 0 {
+		return res, nil
+	}
+	return nil, ErrUserNotFound
+}
+
+func (db *DB) GetAllUser() ([]User, error) {
+	if len(db.Users) == 0 {
+		return nil, ErrUserNotFound
+	}
+	var res []User
+	for _, u := range db.Users {
+		res = append(res, u)
+	}
+	return res, nil
 }

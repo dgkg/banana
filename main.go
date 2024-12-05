@@ -13,6 +13,7 @@ func main() {
 	r.POST("/register", HandleRegister)
 	r.POST("/login", HandlerTest, HandlerLogin)
 	r.GET("/users/:uuid", HandlerGetUserByID)
+	r.GET("/users", HandlerSearchUser)
 	r.Run(":8000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
