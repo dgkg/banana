@@ -4,36 +4,23 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap/buffer"
-	"go.uber.org/zap/zapcore"
+
+	"banana/db"
+	"banana/handler"
 )
 
 func main() {
+	myDb := db.NewDB()
+	myHandler := handler.NewHandler(myDb)
+
 	r := gin.Default()
-	r.POST("/register", HandleRegister)
-	r.POST("/login", HandlerTest, HandlerLogin)
-	r.GET("/users/:uuid", HandlerGetUserByID)
-	r.GET("/users", HandlerSearchUser)
+	r.POST("/register", myHandler.Register)
+	r.POST("/login", HandlerTest, myHandler.Login)
+	r.GET("/users/:uuid", myHandler.GetUserByID)
+	r.GET("/users", myHandler.SearchUser)
 	r.Run(":8000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
 func HandlerTest(ctx *gin.Context) {
 	log.Println("test")
-}
-
-type MyEncoder struct {
-	zapcore.Encoder
-}
-
-func (m *MyEncoder) EncodeEntry(entry zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
-	filtered := make([]zapcore.Field, 0, len(fields))
-	log.Println("fields:", fields)
-	for _, field := range fields {
-		log.Println("field key:", field.Key)
-		if field.Key == "pass" || field.Key == "password" {
-			continue
-		}
-		filtered = append(filtered, field)
-	}
-	return m.Encoder.EncodeEntry(entry, filtered)
 }

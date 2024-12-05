@@ -1,35 +1,27 @@
-package main
+package db
 
 import (
-	"errors"
+	"banana/model"
 
 	"github.com/agnivade/levenshtein"
 )
 
-var db DB
-
 var (
-	ErrUserAllreadExists = errors.New("user email allready exists")
-	ErrUserNotFound      = errors.New("user not found")
+	ErrUserAllreadExists = NewErroNotAuthorized("user", "email allready exists")
+	ErrUserNotFound      = NewErroNotFound("user", "not found")
 )
 
-func init() {
-	db = DB{
-		Users: make(map[string]User),
-	}
-}
-
 type DB struct {
-	Users map[string]User
+	Users map[string]model.User
 }
 
 func NewDB() *DB {
 	return &DB{
-		Users: make(map[string]User),
+		Users: make(map[string]model.User),
 	}
 }
 
-func (db *DB) SetUser(u *User) error {
+func (db *DB) SetUser(u *model.User) error {
 	_, err := db.GetUserByEmail(u.Email)
 	if err == nil {
 		return ErrUserAllreadExists
@@ -38,7 +30,7 @@ func (db *DB) SetUser(u *User) error {
 	return nil
 }
 
-func (db *DB) GetUserByID(uuid string) (*User, error) {
+func (db *DB) GetUserByID(uuid string) (*model.User, error) {
 	u, ok := db.Users[uuid]
 	if !ok {
 		return nil, ErrUserNotFound
@@ -46,7 +38,7 @@ func (db *DB) GetUserByID(uuid string) (*User, error) {
 	return &u, nil
 }
 
-func (db *DB) GetUserByEmail(email string) (*User, error) {
+func (db *DB) GetUserByEmail(email string) (*model.User, error) {
 	for _, u := range db.Users {
 		if u.Email == email {
 			return &u, nil
@@ -55,8 +47,8 @@ func (db *DB) GetUserByEmail(email string) (*User, error) {
 	return nil, ErrUserNotFound
 }
 
-func (db *DB) GetUserByName(name string) ([]User, error) {
-	var res []User
+func (db *DB) GetUserByName(name string) ([]model.User, error) {
+	var res []model.User
 	for _, u := range db.Users {
 		distance := levenshtein.ComputeDistance(u.FirstName+" "+u.LastName, name)
 		if distance > 3 {
@@ -69,11 +61,11 @@ func (db *DB) GetUserByName(name string) ([]User, error) {
 	return nil, ErrUserNotFound
 }
 
-func (db *DB) GetAllUser() ([]User, error) {
+func (db *DB) GetAllUser() ([]model.User, error) {
 	if len(db.Users) == 0 {
 		return nil, ErrUserNotFound
 	}
-	var res []User
+	var res []model.User
 	for _, u := range db.Users {
 		res = append(res, u)
 	}

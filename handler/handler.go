@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"log"
@@ -7,11 +7,22 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
+
+	"banana/db"
+	"banana/model"
 )
 
-func HandlerLogin(ctx *gin.Context) {
+type Handler struct {
+	db *db.DB
+}
+
+func NewHandler(db *db.DB) *Handler {
+	return &Handler{db: db}
+}
+
+func (h *Handler) Login(ctx *gin.Context) {
 	// bin from body payload
-	var payload UserLoginPayload
+	var payload model.UserLoginPayload
 	err := ctx.Bind(&payload)
 	if err != nil {
 		err := NewErrorValidation("user", "invalid payload", err)
@@ -19,7 +30,7 @@ func HandlerLogin(ctx *gin.Context) {
 		return
 	}
 	// get user in db
-	u, err := db.GetUserByEmail(payload.Email)
+	u, err := h.db.GetUserByEmail(payload.Email)
 	if err != nil {
 		respError(ctx, "user", err)
 		return
@@ -34,8 +45,8 @@ func HandlerLogin(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{"ok": true})
 }
 
-func HandleRegister(ctx *gin.Context) {
-	var payload UserRegister
+func (h *Handler) Register(ctx *gin.Context) {
+	var payload model.UserRegister
 	err := ctx.Bind(&payload)
 	// data, err := io.ReadAll(ctx.Request.Body)
 	// if err != nil {
@@ -54,8 +65,8 @@ func HandleRegister(ctx *gin.Context) {
 		return
 	}
 	log.Printf("UserRegisterPayload : %#v", payload)
-	usr := NewUser(payload.FirstName, payload.LastName, payload.Email, payload.Password)
-	err = db.SetUser(usr)
+	usr := model.NewUser(payload.FirstName, payload.LastName, payload.Email, payload.Password)
+	err = h.db.SetUser(usr)
 	if err != nil {
 		respError(ctx, "user", err)
 		return
@@ -63,7 +74,7 @@ func HandleRegister(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, usr)
 }
 
-func HandlerGetUserByID(ctx *gin.Context) {
+func (h *Handler) GetUserByID(ctx *gin.Context) {
 	uuidParam := ctx.Param("uuid")
 	log.Println("HandlerGetUserByID: uuidParam", uuidParam)
 	_, err := uuid.Parse(uuidParam)
@@ -73,7 +84,7 @@ func HandlerGetUserByID(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	u, err := db.GetUserByID(uuidParam)
+	u, err := h.db.GetUserByID(uuidParam)
 	log.Println("HandlerGetUserByID: GetUserByID:", u, err)
 	if err != nil {
 		respError(ctx, "user", err)
@@ -82,10 +93,10 @@ func HandlerGetUserByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, u)
 }
 
-func HandlerSearchUser(ctx *gin.Context) {
+func (h *Handler) SearchUser(ctx *gin.Context) {
 	name := ctx.Query("name")
 	if len(name) > 0 {
-		u, err := db.GetUserByName(name)
+		u, err := h.db.GetUserByName(name)
 		if err != nil {
 			respError(ctx, "user", err)
 			return
@@ -93,7 +104,7 @@ func HandlerSearchUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, u)
 		return
 	}
-	u, err := db.GetAllUser()
+	u, err := h.db.GetAllUser()
 	if err != nil {
 		respError(ctx, "user", err)
 		return
@@ -116,7 +127,7 @@ func respError(ctx *gin.Context, entity string, err error) {
 			"success": false,
 			"error":   err.Message,
 		})
-	case *ErrorDB:
+	case *db.ErrorDB:
 		ctx.JSON(err.StatusCode, gin.H{
 			"success": false,
 			"error":   err.Message,
@@ -126,34 +137,5 @@ func respError(ctx *gin.Context, entity string, err error) {
 			"success": false,
 			"error":   entity + " " + err.Error(),
 		})
-	}
-}
-
-type ErrorHandlerValidation struct {
-	Err        error
-	Message    string
-	Entity     string
-	StatusCode int
-}
-
-func (e *ErrorHandlerValidation) Error() string {
-	return e.Message
-}
-
-func NewErrorValidation(entity, message string, errOrigin error) *ErrorHandlerValidation {
-	return &ErrorHandlerValidation{
-		Err:        errOrigin,
-		Message:    message,
-		Entity:     entity,
-		StatusCode: 400,
-	}
-}
-
-func NewErrorAutorization(entity, uuidUser string) *ErrorHandlerValidation {
-	return &ErrorHandlerValidation{
-		Err:        nil,
-		Message:    "user not authorized",
-		Entity:     entity + " " + uuidUser,
-		StatusCode: 401,
 	}
 }
