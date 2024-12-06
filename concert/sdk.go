@@ -1,6 +1,7 @@
 package concert
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -33,8 +34,11 @@ func New(key string) *SDKAPI {
 const BaseURL = "https://api.setlist.fm/rest/1.0/"
 
 func execGet(cli *http.Client, url, key string, payload interface{}) error {
-	// init the request GET
-	req, err := http.NewRequest("GET", url, nil)
+	// create a context with a timeout.
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	// create the request
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
