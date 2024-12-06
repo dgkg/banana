@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/viper"
 )
@@ -40,6 +39,5 @@ func New() *Config {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	log.Println("config:", config)
 	return &config
 }
