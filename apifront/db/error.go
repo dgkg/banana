@@ -1,6 +1,9 @@
 package db
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	ErrUserAllreadExists = NewErroNotAuthorized("user", "email allready exists")
@@ -15,7 +18,7 @@ type ErrorDB struct {
 }
 
 func (e *ErrorDB) Error() string {
-	return fmt.Sprintf("Error: %w, Entity: %s, Message: %s, StatusCode: %d", e.Err, e.Entity, e.Message, e.StatusCode)
+	return fmt.Sprintf("Error: %v, Entity: %s, Message: %s, StatusCode: %d", e.Err, e.Entity, e.Message, e.StatusCode)
 }
 
 func NewErroNotFound(entity, message string) *ErrorDB {
@@ -23,7 +26,7 @@ func NewErroNotFound(entity, message string) *ErrorDB {
 		message = fmt.Sprintf("%s not found", entity)
 	}
 	return &ErrorDB{
-		Err:        fmt.Errorf("not found"),
+		Err:        errors.New("not found"),
 		Entity:     entity,
 		Message:    message,
 		StatusCode: 404,
@@ -47,7 +50,7 @@ func NewErroNotAuthorized(entity, message string) *ErrorDB {
 		message = fmt.Sprintf("%s not authorized", entity)
 	}
 	return &ErrorDB{
-		Err:        fmt.Errorf("not authorized"),
+		Err:        errors.New("not authorized"),
 		Entity:     entity,
 		Message:    message,
 		StatusCode: 401,

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -54,18 +53,14 @@ func (h *Handler) Register(ctx *gin.Context) {
 	// log.Println("data in body:", string(data))
 	// err = json.Unmarshal(data, &payload)
 	if err != nil {
-		log.Println("error in bind", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	log.Printf("Register : %#v", payload)
 	err = validator.New().Struct(payload)
 	if err != nil {
-		log.Println("error in validation", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	log.Printf("Register : %#v", payload)
 	usr := model.NewUser(payload.FirstName, payload.LastName, payload.Email, payload.Password)
 	err = h.db.SetUser(usr)
 	if err != nil {
@@ -77,16 +72,12 @@ func (h *Handler) Register(ctx *gin.Context) {
 
 func (h *Handler) GetUserByID(ctx *gin.Context) {
 	uuidParam := ctx.Param("uuid")
-	log.Println("HandlerGetUserByID: uuidParam", uuidParam)
 	_, err := uuid.Parse(uuidParam)
-	log.Println("HandlerGetUserByID: err", err)
 	if err != nil {
-		log.Println("validation uuid", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 	u, err := h.db.GetUserByID(uuidParam)
-	log.Println("HandlerGetUserByID: GetUserByID:", u, err)
 	if err != nil {
 		respError(ctx, "user", err)
 		return
@@ -117,7 +108,6 @@ func (h *Handler) UpdateUser(ctx *gin.Context) {
 	uuidParam := ctx.Param("uuid")
 	_, err := uuid.Parse(uuidParam)
 	if err != nil {
-		// ctx.AbortWithStatus(http.StatusBadRequest)
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
