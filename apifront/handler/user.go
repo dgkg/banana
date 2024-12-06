@@ -54,15 +54,18 @@ func (h *Handler) Register(ctx *gin.Context) {
 	// log.Println("data in body:", string(data))
 	// err = json.Unmarshal(data, &payload)
 	if err != nil {
+		log.Println("error in bind", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
+	log.Printf("Register : %#v", payload)
 	err = validator.New().Struct(payload)
 	if err != nil {
+		log.Println("error in validation", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	log.Printf("UserRegisterPayload : %#v", payload)
+	log.Printf("Register : %#v", payload)
 	usr := model.NewUser(payload.FirstName, payload.LastName, payload.Email, payload.Password)
 	err = h.db.SetUser(usr)
 	if err != nil {

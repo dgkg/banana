@@ -10,21 +10,11 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
 	"banana/apifront/db"
 	"banana/apifront/model"
 )
-
-func GetTestGinContext() (*gin.Context, *httptest.ResponseRecorder) {
-	gin.SetMode(gin.TestMode)
-
-	w := httptest.NewRecorder()
-	ctx, _ := gin.CreateTestContext(w)
-	ctx.Request = &http.Request{
-		Header: make(http.Header),
-	}
-	return ctx, w
-}
 
 func TestUserHandlers(t *testing.T) {
 
@@ -50,31 +40,15 @@ func TestUserHandlers(t *testing.T) {
 			t.Errorf("expected: %v, got: %v", http.StatusOK, ctx.Writer.Status())
 		}
 		// Check if the response body is correct.
-		urs, err := io.ReadAll(w.Body)
+		payloadResponse, err := io.ReadAll(w.Body)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
-		log.Println("body:", string(urs))
+		log.Println("body:", string(payloadResponse))
 		// Check if the response body is correct.
 		// usualy we should use reflect.DeepEqual
 		// but here we are sure that the password is hashed
-		var user model.User
-		err = json.Unmarshal(urs, &user)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if user.UUID != u.UUID {
-			t.Errorf("expected: %v, got: %v", u.UUID, user.UUID)
-		}
-		if user.FirstName != u.FirstName {
-			t.Errorf("expected: %v, got: %v", u.FirstName, user.FirstName)
-		}
-		if user.LastName != u.LastName {
-			t.Errorf("expected: %v, got: %v", u.LastName, user.LastName)
-		}
-		if user.Email != u.Email {
-			t.Errorf("expected: %v, got: %v", u.Email, user.Email)
-		}
+		checkUserFields(t, payloadResponse, u)
 	})
 	t.Run("Register", func(t *testing.T) {
 
@@ -82,28 +56,84 @@ func TestUserHandlers(t *testing.T) {
 		payload := model.UserRegisterPayload{
 			FirstName: "Jane",
 			LastName:  "Doe",
-			Email:     "jane@doe.fr",
+			Email:     "jane.test@doebibi.fr",
 			Password:  "password",
 		}
-		// Create a JSON representation of the UserRegisterPayload value.
-		b, err := json.Marshal(payload)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
+		urJane := &model.User{
+			FirstName: "Jane",
+			LastName:  "Doe",
+			Email:     "jane.test@doebibi.fr",
+			Password:  "password",
 		}
 
 		// Create a new gin context.
 		ctx, w := GetTestGinContext()
-		// Set the request body.
-		bod := bytes.NewReader(b)
-		// bod.Write(b)
-		ctx.Request.Body = bod
+
+		// Mock the request with the payload value in the body.
+		mockJsonPost(ctx, payload)
+
+		// Call the Register method of the Handler value.
 		handl.Register(ctx)
 
-		urs, err := io.ReadAll(w.Body)
+		// Check if the response status code is 200.
+		payloadResponse, err := io.ReadAll(w.Body)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
-		log.Println("body:", string(urs))
+		if ctx.Writer.Status() != http.StatusOK {
+			t.Errorf("expected: %v, got: %v", http.StatusOK, ctx.Writer.Status())
+		}
 
+		// Check if the response body is correct.
+		log.Println("body:", string(payloadResponse))
+		checkUserFields(t, payloadResponse, urJane)
 	})
+}
+
+func mockJsonPost(ctx *gin.Context, content interface{}) {
+	ctx.Request.Method = "POST" // or PUT
+	ctx.Request.Header.Set("Content-Type", "application/json")
+
+	jsonbytes, err := json.Marshal(content)
+	if err != nil {
+		panic(err)
+	}
+
+	// the request body must be an io.ReadCloser
+	// the bytes buffer though doesn't implement io.Closer,
+	// so you wrap it in a no-op closer
+	ctx.Request.Body = io.NopCloser(bytes.NewBuffer(jsonbytes))
+}
+
+func checkUserFields(t *testing.T, data []byte, refUser *model.User) {
+	var user model.User
+	err := json.Unmarshal(data, &user)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if _, err = uuid.Parse(user.UUID); err != nil {
+		t.Errorf("expected: a valid uuid got %v", user.UUID)
+	}
+	if user.FirstName != refUser.FirstName {
+		t.Errorf("expected: %v, got: %v", refUser.FirstName, user.FirstName)
+	}
+	if user.LastName != refUser.LastName {
+		t.Errorf("expected: %v, got: %v", refUser.LastName, user.LastName)
+	}
+	if user.Email != refUser.Email {
+		t.Errorf("expected: %v, got: %v", refUser.Email, user.Email)
+	}
+}
+
+func GetTestGinContext() (*gin.Context, *httptest.ResponseRecorder) {
+	gin.SetMode(gin.TestMode)
+
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	ctx.Request = &http.Request{
+		Header: make(http.Header),
+	}
+	ctx.Request.Header.Set("Content-Type", "application/json")
+
+	return ctx, w
 }
