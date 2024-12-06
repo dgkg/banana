@@ -18,6 +18,14 @@ type Artist struct {
 	URL            string `json:"url"`
 }
 
+type ArtistListResponse struct {
+	Type         string   `json:"type"`
+	ItemsPerPage int      `json:"itemsPerPage"`
+	Page         int      `json:"page"`
+	Total        int      `json:"total"`
+	Artist       []Artist `json:"artist"`
+}
+
 func (sdk *SDKArtist) GetByID(uuid string) (*Artist, error) {
 	// create the full url
 	url := BaseURL + "artist/" + uuid
@@ -49,10 +57,11 @@ func (sdk *SDKArtist) Search(query map[string]string) ([]Artist, error) {
 		u.RawQuery = q.Encode()
 	}
 	// try to exec the request
-	var as []Artist
-	err = execGet(sdk.cli, u.String(), sdk.key, &as)
+	var response ArtistListResponse
+	err = execGet(sdk.cli, u.String(), sdk.key, &response)
 	if err != nil {
 		return nil, err
 	}
-	return as, nil
+
+	return response.Artist, nil
 }

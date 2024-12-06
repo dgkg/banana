@@ -10,3 +10,12 @@ type ErrConcertResponse struct {
 func (e ErrConcertResponse) Error() string {
 	return e.Message
 }
+
+func NewErrNotFound(message string) ErrConcertResponse {
+	return ErrConcertResponse{
+		Code:      404,
+		Status:    "Not Found",
+		Message:   message,
+		Timestamp: "now",
+	}
+}
