@@ -18,7 +18,7 @@ type Artist struct {
 	URL            string `json:"url"`
 }
 
-func (sdk *SDKArtist) GetArtistByID(uuid string) (*Artist, error) {
+func (sdk *SDKArtist) GetByID(uuid string) (*Artist, error) {
 	// create the full url
 	url := BaseURL + "artist/" + uuid
 	// try to exec the request
@@ -30,7 +30,7 @@ func (sdk *SDKArtist) GetArtistByID(uuid string) (*Artist, error) {
 	return &a, nil
 }
 
-func (sdk *SDKArtist) SearchArtists(query map[string]string) ([]Artist, error) {
+func (sdk *SDKArtist) Search(query map[string]string) ([]Artist, error) {
 	if query == nil {
 		query = make(map[string]string)
 	}

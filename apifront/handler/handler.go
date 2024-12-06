@@ -4,18 +4,15 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"banana/apifront/db"
-	"banana/concert"
 )
 
 type Handler struct {
-	db      db.DB
-	concert *concert.SDKAPI
+	db db.DB
 }
 
-func NewHandler(db db.DB, concert *concert.SDKAPI) *Handler {
+func NewHandler(db db.DB) *Handler {
 	return &Handler{
-		db:      db,
-		concert: concert,
+		db: db,
 	}
 }
 
@@ -26,4 +23,6 @@ func (h *Handler) InitRoutes(r *gin.Engine) {
 	r.POST("/login", h.Login)
 	r.GET("/users/:uuid", authWithJWT, h.GetUserByID)
 	r.GET("/users", authWithJWT, h.SearchUser)
+	// concert routes
+
 }
