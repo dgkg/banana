@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -79,17 +78,17 @@ func solutionQRCode2(ctx *gin.Context) {
 
 	// New will create file automatically.
 	options := []standard.ImageOption{
-		standard.WithBgColorRGBHex("#FF00FF"),
+		standard.WithBgColorRGBHex("#FFFFFF"),
 		standard.WithFgColorRGBHex("#000000"),
 	}
 
-	// create a custom writer
+	// wrap the original gin.ResponseWriter with with Close func.
 	rwc := &RWCloser{ctx.Writer}
 
-	//	create the filename
+	// creates the qrcode writer (*standard.Writer).
 	writer := standard.NewWithWriter(rwc, options...)
 
-	// write to response
+	// write the qrcode data image into the response writer.
 	if err = qrc.Save(writer); err != nil {
 		fmt.Printf("could not save image: %v", err)
 		respError(ctx, "qrcode", err)
@@ -101,17 +100,16 @@ func solutionQRCode2(ctx *gin.Context) {
 	ctx.Writer.WriteHeader(200)
 }
 
+// RWCloser is a custom writer which implements io.Closer.
 type RWCloser struct {
 	gin.ResponseWriter
 }
 
 func (rwc *RWCloser) Close() error {
 	notify := rwc.CloseNotify()
-	val, ok := <-notify
+	_, ok := <-notify
 	if !ok {
-		log.Println("notify: allready close")
 		return nil
 	}
-	log.Println("notify: ", val)
 	return nil
 }
