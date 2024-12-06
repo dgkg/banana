@@ -23,6 +23,7 @@ func (h *Handler) InitRoutes(r *gin.Engine) {
 	r.POST("/login", h.Login)
 	r.GET("/users/:uuid", authWithJWT, h.GetUserByID)
 	r.GET("/users", authWithJWT, h.SearchUser)
+	r.GET("/qrcode", h.GetQRCode)
 	// concert routes
 
 }
