@@ -1,0 +1,11 @@
+Env: "dev"
+DB:
+  Host: "dsn"
+  Login: "toto"
+  Password: "password"
+  Port: "5432"
+DBSQLite:
+  FileName: "banan.db"
+PortApi: "8001"
+PortConcert: "8000"
+APIConcertKey: "CVPUbWJa4ItbkVQDmExWnyBdUKkKwMpx2Vbn"

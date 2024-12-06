@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"banana/apifront/config"
 	"banana/apifront/db"
 	"banana/apifront/handler"
 	"banana/concert"
@@ -24,14 +25,12 @@ const (
 )
 
 func main() {
-	env := os.Getenv("ENV")
-	if env == "" {
-		env = EnvLocal
-	}
-	log.Println("ENV:", env)
+	config := config.New()
+
+	log.Println("ENV:", config.Env)
 	// init db and elements of my app depending of the env
 	var myDb db.DB
-	switch env {
+	switch config.Env {
 	case EnvLocal:
 		myDb = db.NewMoke()
 	case EnvPreprod:
@@ -53,7 +52,7 @@ func main() {
 		api := gin.Default()
 		myHandler.InitRoutes(api)
 		srvAPI = &http.Server{
-			Addr:    ":8000",
+			Addr:    ":" + config.PortApi,
 			Handler: api.Handler(),
 		}
 		srvAPI.ListenAndServe()
@@ -61,7 +60,7 @@ func main() {
 
 	var srvConcert *http.Server
 	go func() {
-		sdkConcert := concert.New("CVPUbWJa4ItbkVQDmExWnyBdUKkKwMpx2Vbn")
+		sdkConcert := concert.New(config.APIConcertKey)
 		concertAPI := gin.Default()
 		concertAPI.GET("/artists", func(ctx *gin.Context) {
 			artistName := ctx.Query("name")
@@ -73,7 +72,7 @@ func main() {
 			ctx.JSON(200, artists)
 		})
 		srvConcert = &http.Server{
-			Addr:    ":8001",
+			Addr:    ":" + config.PortConcert,
 			Handler: concertAPI.Handler(),
 		}
 		srvConcert.ListenAndServe()
