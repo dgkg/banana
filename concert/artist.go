@@ -1,6 +1,14 @@
 package concert
 
-import "net/url"
+import (
+	"net/http"
+	"net/url"
+)
+
+type SDKArtist struct {
+	key string
+	cli *http.Client
+}
 
 type Artist struct {
 	Mbid           string `json:"mbid"`
@@ -10,19 +18,19 @@ type Artist struct {
 	URL            string `json:"url"`
 }
 
-func (sdk *SDKAPI) GetArtistByID(uuid string) (*Artist, error) {
+func (sdk *SDKArtist) GetArtistByID(uuid string) (*Artist, error) {
 	// create the full url
 	url := BaseURL + "artist/" + uuid
 	// try to exec the request
 	var a Artist
-	err := sdk.execGet(url, &a)
+	err := execGet(sdk.cli, url, sdk.key, &a)
 	if err != nil {
 		return nil, err
 	}
 	return &a, nil
 }
 
-func (sdk *SDKAPI) SearchArtists(query map[string]string) ([]Artist, error) {
+func (sdk *SDKArtist) SearchArtists(query map[string]string) ([]Artist, error) {
 	if query == nil {
 		query = make(map[string]string)
 	}
@@ -42,7 +50,7 @@ func (sdk *SDKAPI) SearchArtists(query map[string]string) ([]Artist, error) {
 	}
 	// try to exec the request
 	var as []Artist
-	err = sdk.execGet(u.String(), &as)
+	err = execGet(sdk.cli, u.String(), sdk.key, &as)
 	if err != nil {
 		return nil, err
 	}
