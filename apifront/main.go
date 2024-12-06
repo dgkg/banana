@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -51,8 +52,9 @@ func main() {
 		// init routes
 		api := gin.Default()
 		myHandler.InitRoutes(api)
+
 		srvAPI = &http.Server{
-			Addr:    ":" + config.PortApi,
+			Addr:    ":" + strconv.Itoa(config.PortApi),
 			Handler: api.Handler(),
 		}
 		srvAPI.ListenAndServe()
@@ -72,7 +74,7 @@ func main() {
 			ctx.JSON(200, artists)
 		})
 		srvConcert = &http.Server{
-			Addr:    ":" + config.PortConcert,
+			Addr:    ":" + strconv.Itoa(config.PortConcert),
 			Handler: concertAPI.Handler(),
 		}
 		srvConcert.ListenAndServe()

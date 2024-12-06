@@ -18,9 +18,13 @@ type Config struct {
 	DBSQLite struct {
 		FileName string
 	}
-	PortApi       string
-	PortConcert   string
+	PortApi       int
+	PortConcert   int
 	APIConcertKey string
+}
+
+func (c Config) String() string {
+	return "not authorized to display"
 }
 
 func New() *Config {

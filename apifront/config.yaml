@@ -6,6 +6,6 @@ DB:
   Port: "5432"
 DBSQLite:
   FileName: "banan.db"
-PortApi: "8001"
-PortConcert: "8000"
+PortApi: 8001
+PortConcert: 8000
 APIConcertKey: "CVPUbWJa4ItbkVQDmExWnyBdUKkKwMpx2Vbn"
