@@ -4,14 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"banana/apifront/db"
+	"banana/concert"
 )
 
 type Handler struct {
-	db db.DB
+	db      db.DB
+	concert *concert.SDKAPI
 }
 
-func NewHandler(db db.DB) *Handler {
-	return &Handler{db: db}
+func NewHandler(db db.DB, concert *concert.SDKAPI) *Handler {
+	return &Handler{
+		db:      db,
+		concert: concert,
+	}
 }
 
 func (h *Handler) InitRoutes(r *gin.Engine) {

@@ -12,6 +12,7 @@ import (
 )
 
 func (h *Handler) Login(ctx *gin.Context) {
+
 	// bin from body payload
 	var payload model.UserLoginPayload
 	err := ctx.Bind(&payload)

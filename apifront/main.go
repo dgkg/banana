@@ -8,27 +8,40 @@ import (
 
 	"banana/apifront/db"
 	"banana/apifront/handler"
+	"banana/concert"
+)
+
+const (
+	EnvProd    = "prod"
+	EnvPreprod = "preprod"
+	EnvDev     = "dev"
+	EnvLocal   = "local"
 )
 
 func main() {
 	env := os.Getenv("ENV")
 	if env == "" {
-		env = "prod"
+		env = EnvLocal
 	}
+	sdkConcert := concert.New("CVPUbWJa4ItbkVQDmExWnyBdUKkKwMpx2Vbn")
 	log.Println("ENV:", env)
-	// init db and elements of my app
+	// init db and elements of my app depending of the env
 	var myDb db.DB
-	if env == "local" {
+	switch env {
+	case EnvLocal:
 		myDb = db.NewMoke()
-	} else if env == "prod" {
+	case EnvPreprod:
+		myDb = db.NewMoke()
+	case EnvDev:
+		myDb = db.NewMoke()
+	case EnvProd:
 		myDb = db.NewSQLite("banana.db")
-	}
-	if myDb == nil {
+	default:
 		panic("error creating db")
 	}
 
 	// create handler
-	myHandler := handler.NewHandler(myDb)
+	myHandler := handler.NewHandler(myDb, sdkConcert)
 	// init routes
 	r := gin.Default()
 	myHandler.InitRoutes(r)
