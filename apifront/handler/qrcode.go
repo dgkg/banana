@@ -78,12 +78,15 @@ func solutionQRCode2(ctx *gin.Context) {
 
 	// New will create file automatically.
 	options := []standard.ImageOption{
-		standard.WithBgColorRGBHex("#FFFFFF"),
+		standard.WithBgColorRGBHex("#FBEFD5"),
 		standard.WithFgColorRGBHex("#000000"),
+		standard.WithLogoImageFilePNG("./html/public/img/logo.png"),
+		standard.WithLogoSizeMultiplier(2),
+		standard.WithBuiltinImageEncoder(standard.PNG_FORMAT),
 	}
 
 	// write jpeg image to response
-	ctx.Writer.Header().Set("Content-Type", "image/jpeg")
+	ctx.Writer.Header().Set("Content-Type", "image/png")
 	ctx.Writer.WriteHeader(200)
 
 	// wrap the original gin.ResponseWriter with with Close func.
