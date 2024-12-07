@@ -82,6 +82,10 @@ func solutionQRCode2(ctx *gin.Context) {
 		standard.WithFgColorRGBHex("#000000"),
 	}
 
+	// write jpeg image to response
+	ctx.Writer.Header().Set("Content-Type", "image/jpeg")
+	ctx.Writer.WriteHeader(200)
+
 	// wrap the original gin.ResponseWriter with with Close func.
 	rwc := &RWCloser{ctx.Writer}
 
@@ -95,9 +99,6 @@ func solutionQRCode2(ctx *gin.Context) {
 		return
 	}
 
-	// respond
-	ctx.Writer.Header().Set("Content-Type", "image/jpeg")
-	ctx.Writer.WriteHeader(200)
 }
 
 // RWCloser is a custom writer which implements io.Closer.
@@ -105,11 +106,7 @@ type RWCloser struct {
 	gin.ResponseWriter
 }
 
+// Close implements io.Closer interface.
 func (rwc *RWCloser) Close() error {
-	notify := rwc.CloseNotify()
-	_, ok := <-notify
-	if !ok {
-		return nil
-	}
 	return nil
 }
