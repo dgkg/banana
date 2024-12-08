@@ -66,6 +66,10 @@ func main() {
 		concertAPI := gin.Default()
 		concertAPI.GET("/artists", func(ctx *gin.Context) {
 			artistName := ctx.Query("name")
+			if artistName == "" {
+				ctx.JSON(400, gin.H{"error": "name query is mandatory"})
+				return
+			}
 			artists, err := sdkConcert.Artists.Search(map[string]string{"artistName": artistName})
 			if err != nil {
 				ctx.JSON(500, gin.H{"error": err.Error()})
