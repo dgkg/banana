@@ -9,5 +9,3 @@
 - Qrcodes generate
 - Front (Sub, login, concert list, qrcode)
 - Validate Qrcode
-
-CVPUbWJa4ItbkVQDmExWnyBdUKkKwMpx2Vbn
